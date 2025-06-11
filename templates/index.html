@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Treasure Island</title>
+    <style>
+        html {
+            background-color: black !important;
+        }
+        
+        body {
+            background-color: black !important;
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            color: #00FF00;
+        }
+
+        h1 {
+            font-family: 'Brush Script MT', cursive;
+            color: gold;
+            font-size: 50px;
+            margin: 10px 0;
+        }
+
+        pre {
+            color: #00FF00;
+            font-size: 12px;
+            text-align: center;
+            max-width: 100%;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+
+        .game-box {
+            background-color: #111;
+            border: 2px solid gold;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 20px gold;
+        }
+
+        .question, .response {
+            color: #00FF00;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            background-color: black;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            margin: 10px;
+            outline: none;
+        }
+
+        button:hover {
+            background-color: #00FF00;
+            color: black;
+            cursor: pointer;
+        }
+
+        .response {
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Treasure Island</h1>
+
+    <pre>
+*******************************************************************************
+          |                   |                  |                     |
+ _________|________________.=""_;=.______________|_____________________|_______
+|                   |  ,-"_,=""     `"=.|                  |
+|___________________|__"=._o`"-._        `"=.______________|___________________
+          |                `"=._o`"=._      _`"=._                     |
+ _________|_____________________:=._o "=._."_.-="'"=.__________________|_______
+|                   |    __.--" , ; `"=._o." ,-"""-._ ".   |
+|___________________|_._"  ,. .` ` `` ,  `"-._"-._   ". '__|___________________
+          |           |o`"=._` , "` `; .". ,  "-._"-._; ;              |
+ _________|___________| ;`-.o`"=._; ." ` '`."\ ` . "-._ /_______________|_______
+|                   | |o ;    `"-.o`"=._``  '` " ,__.--o;   |
+|___________________|_| ;     (#) `-.o `"=.`_.--"_o.-; ;___|___________________
+____/______/______/___|o;._    "      `".o|o_.--"    ;o;____/______/______/____
+/______/______/______/_"=._o--._        ; | ;        ; ;/______/______/______/_ 
+____/______/______/______/__"=._o--._   ;o|o;     _._;o;____/______/______/____
+/______/______/______/______/____"=._o._; | ;_.--"o.--"_/______/______/______/_ 
+____/______/______/______/______/_____"=.o|o_.--""___/______/______/______/____ 
+/______/______/______/______/______/______/______/______/______/______/_____ /
+*******************************************************************************
+    </pre>
+
+    <div class="game-box">
+        <div class="question" id="question">You're at a cross road. Where do you want to go? Type "left" or "right":</div>
+        <input type="text" id="userInput" autofocus/>
+        <button onclick="play()">Submit</button>
+        <div class="response" id="response"></div>
+    </div>
+
+    <script>
+        let stage = 1;
+
+        // Force black background on page load and always
+        function forceBlackBackground() {
+            document.documentElement.style.backgroundColor = "black";
+            document.body.style.backgroundColor = "black";
+        }
+
+        // Call on page load
+        document.addEventListener("DOMContentLoaded", forceBlackBackground);
+        window.addEventListener("load", forceBlackBackground);
+
+        function play() {
+            const input = document.getElementById("userInput").value;
+            fetch("/play", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ stage: stage, input: input })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // Force black background after each response
+                forceBlackBackground();
+                
+                if (data.game_over) {
+                    document.getElementById("response").innerText = data.message;
+                    document.getElementById("question").innerText = "Game Over. Refresh page to restart.";
+                } else {
+                    document.getElementById("question").innerText = data.message;
+                    stage = data.stage;
+                    document.getElementById("response").innerText = "";
+                }
+                document.getElementById("userInput").value = "";
+            });
+        }
+
+        // Force black background immediately
+        forceBlackBackground();
+    </script>
+
+</body>
+</html>
